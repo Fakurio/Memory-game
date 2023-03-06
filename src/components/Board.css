@@ -1,0 +1,40 @@
+h1 {
+  font-size: 4rem;
+  letter-spacing: 5px;
+  text-align: center;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 1fr 1fr;
+  gap: 10px;
+  margin-top: 80px;
+}
+
+.scene {
+  width: 25vw;
+  max-width: 150px;
+  height: 25vw;
+  max-height: 150px;
+  perspective: 300px;
+}
+
+.win-info {
+  margin-top: 80px;
+  text-align: center;
+}
+
+.win-info p {
+  font-size: 2rem;
+}
+
+.win-info button {
+  margin-top: 10px;
+}
+
+@media (max-width: 800px) {
+  .board {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
