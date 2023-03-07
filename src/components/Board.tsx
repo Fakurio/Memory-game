@@ -17,21 +17,13 @@ type Card = {
   img: string;
 };
 
-const Board = () => {
-  const [cards, setCards] = useState<Card[]>([
-    { revealed: false, img: "" },
-    { revealed: false, img: "" },
-    { revealed: false, img: "" },
-    { revealed: false, img: "" },
-    { revealed: false, img: "" },
-    { revealed: false, img: "" },
-    { revealed: false, img: "" },
-    { revealed: false, img: "" },
-    { revealed: false, img: "" },
-    { revealed: false, img: "" },
-    { revealed: false, img: "" },
-    { revealed: false, img: "" },
-  ]);
+interface BoardProps {
+  blur: React.RefObject<HTMLDivElement>;
+  pairsNumber: number;
+}
+
+const Board = ({ blur, pairsNumber }: BoardProps) => {
+  const [cards, setCards] = useState<Card[]>([]);
   const [visibleCard, setVisibleCard] = useState<number>(-1);
   const [isOneVisible, setIsOneVisible] = useState<boolean>(false);
   const [guessedCards, setGuessedCards] = useState<number[]>([]);
@@ -74,7 +66,6 @@ const Board = () => {
   };
 
   const handleCardClick = (cardIndex: number) => {
-    console.log("Benc");
     if (isLocked) return;
     if (isOneVisible) {
       setIsLocked(true);
@@ -95,25 +86,6 @@ const Board = () => {
     }
   };
 
-  const cacheImages = async (imgs: string[]) => {
-    let promises: Promise<string>[] = imgs.map(
-      (src) =>
-        new Promise((resolve, reject) => {
-          let img = new Image();
-          img.src = src;
-          img.onload = () => resolve(src);
-          img.onerror = () => reject();
-        })
-    );
-    let catsImgs: string[] = await Promise.all(promises);
-    setCards((prevState) =>
-      prevState.map((card, idx) => {
-        return { ...card, img: catsImgs[idx] };
-      })
-    );
-    setIsLoading(false);
-  };
-
   useEffect(() => {
     let catsImg = [
       Abyssinian,
@@ -128,36 +100,48 @@ const Board = () => {
       Arabian,
     ]
       .sort((a, b) => 0.5 - Math.random())
-      .slice(0, 6)
+      .slice(0, pairsNumber)
       .reduce((acc: string[], value: string) => [...acc, value, value], [])
       .sort((a, b) => 0.5 - Math.random());
-    cacheImages(catsImg);
-  }, []);
+    setCards(
+      catsImg.reduce(
+        (acc: Card[], value: string) => [
+          ...acc,
+          { revealed: false, img: value },
+        ],
+        []
+      )
+    );
+    setGuessedCards([]);
+    setPairsLeft(pairsNumber);
+    setIsLoading(false);
+  }, [pairsNumber]);
 
   return (
     <>
       {!isLoading && (
-        <>
+        <div ref={blur}>
           <h1>Memory Game</h1>
           {pairsLeft === 0 ? (
             <div className="win-info">
               <p>You win!!!</p>
               <button onClick={() => location.reload()}>Play again</button>
             </div>
-          ) : undefined}
-          <div className="board">
-            {cards.map((card, idx) => (
-              <div className="scene" key={idx}>
-                <Card
-                  isRevealed={cards[idx].revealed}
-                  isGuessed={guessedCards.includes(idx)}
-                  bgImg={cards[idx].img}
-                  handleCardClick={() => handleCardClick(idx)}
-                ></Card>
-              </div>
-            ))}
-          </div>
-        </>
+          ) : (
+            <div className="board">
+              {cards.map((card, idx) => (
+                <div className="scene" key={idx}>
+                  <Card
+                    isRevealed={cards[idx].revealed}
+                    isGuessed={guessedCards.includes(idx)}
+                    bgImg={cards[idx].img}
+                    handleCardClick={() => handleCardClick(idx)}
+                  ></Card>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       )}
     </>
   );
