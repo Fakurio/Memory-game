@@ -19,9 +19,7 @@ const Card = ({ isRevealed, isGuessed, bgImg, handleCardClick }: CardProps) => {
         <div className="card-face  card-face-front"></div>
         <div
           className={`card-face card-face-back ${isRevealed ? "cardA" : ""}`}
-          style={
-            isRevealed ? { backgroundImage: `url("${bgImg}")` } : undefined
-          }
+          style={{ backgroundImage: `url("${bgImg}")` }}
         ></div>
       </div>
     </>
